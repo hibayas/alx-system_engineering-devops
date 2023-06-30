@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# print file names without the number prefix
-
-for file_name in *
+# Bash script that displays content
+for search in *
 do
-	echo "$file_name" | cut -d "-" -f2-
+	echo "$search" | cut -d "-" -f 2
 done
