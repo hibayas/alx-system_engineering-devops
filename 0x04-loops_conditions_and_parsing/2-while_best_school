@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# prints a string 10 times using while loop 
+# Bash script that displays "Best School" 10times
 
-i=0
+index=0
 
-while [ "$i" -lt 10 ]; do
+while [ $index -lt 10 ]
+do
   echo "Best School"
-  ((i++))
+  ((index++))
 done
