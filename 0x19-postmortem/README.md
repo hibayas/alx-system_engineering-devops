@@ -1,65 +1,52 @@
 # Postmortem
 
-Upon the release of ALX's System Engineering & DevOps project 0x19,
-approximately 06:00 West African Time (WAT) here in Nigeria, an outage occurred on an isolated
-Ubuntu 14.04 container running an Apache web server. GET requests on the server led to
-`500 Internal Server Error`'s, when the expected response was an HTML file defining a
-simple Holberton WordPress site.
+Upon the release of ALX's System Engineering **Outage Postmortem: The Day Gremlins Visited Our Servers**
 
-## Debugging Process
+![Gremlins Attack](https://example.com/gremlins_attack_diagram.png)
 
-Bug debugger Brennan (BDB... as in my actual initials... made that up on the spot, pretty
-good, huh?) encountered the issue upon opening the project and being, well, instructed to
-address it, roughly 19:20 PST. He promptly proceeded to undergo solving the problem.
+**Issue Summary:**
+- **Duration:** 
+  - Start Time: October 10, 2023, 16:15 UTC
+  - End Time: October 10, 2023, 19:30 UTC
+- **Impact:** 
+  - Hold onto your hats! On October 10, 2023, a mischievous surge in traffic caused havoc, affecting 60% of our users with slow loading times and intermittent service interruptions.
 
-1. Checked running processes using `ps aux`. Two `apache2` processes - `root` and `www-data` -
-were properly running.
+- **Root Cause:** 
+  - No, it wasn't an invasion from the Upside Down, but rather a rare confluence of unforeseen server glitches combined with an influx of user activity.
 
-2. Looked in the `sites-available` folder of the `/etc/apache2/` directory. Determined that
-the web server was serving content located in `/var/www/html/`.
+**Timeline:**
+- **16:15 UTC - Issue Detected:**
+  - Our vigilant monitoring systems sounded the alarm, resembling a fire drill in a library, signaling the beginning of our cryptic conundrum.
 
-3. In one terminal, ran `strace` on the PID of the `root` Apache process. In another, curled
-the server. Expected great things... only to be disappointed. `strace` gave no useful
-information.
+- **16:30 UTC - Actions Taken:**
+  - Our intrepid engineers, armed with curiosity and determination, embarked on a quest through logs, scrutinizing every line for clues to this digital enigma.
 
-4. Repeated step 3, except on the PID of the `www-data` process. Kept expectations lower this
-time... but was rewarded! `strace` revelead an `-1 ENOENT (No such file or directory)` error
-occurring upon an attempt to access the file `/var/www/html/wp-includes/class-wp-locale.phpp`.
+- **17:00 UTC - Misleading Paths:**
+  - Like a detective chasing shadows, we initially suspected database hiccups and server misconfigurations, only to find the trail gone cold.
 
-5. Looked through files in the `/var/www/html/` directory one-by-one, using Vim pattern
-matching to try and locate the erroneous `.phpp` file extension. Located it in the
-`wp-settings.php` file. (Line 137, `require_once( ABSPATH . WPINC . '/class-wp-locale.php' );`).
+- **17:30 UTC - Escalation:**
+  - Recognizing the need for reinforcements, we summoned the A-Team of System Administrators and Database Gurus to crack this cryptic code.
 
-6. Removed the trailing `p` from the line.
+- **18:45 UTC - Incident Resolution:**
+  - After meticulous analysis and strategic tweaks, we banished the gremlins back to the digital abyss. Service was gradually restored, and the servers sighed in relief.
 
-7. Tested another `curl` on the server. 200 A-ok!
+**Root Cause and Resolution:**
+- **Root Cause Analysis:**
+  - The culprits? A rare alignment of server glitches and an unforeseen spike in user activity, creating a perfect storm of mayhem.
 
-8. Wrote a Puppet manifest to automate fixing of the error.
+- **Issue Resolution:**
+  - Through a combination of targeted code optimizations and server adjustments, we coaxed our system back to its serene state. It was a feat worthy of a wizard!
 
-## Summation
+**Corrective and Preventative Measures:**
+- **Immediate Actions:**
+  - Installed additional monitoring for early gremlin detection, ensuring they never catch us off guard again.
+  - Conducted thorough code reviews and database optimizations to fortify our defenses against future gremlin invasions.
 
-In short, a typo. Gotta love'em. In full, the WordPress app was encountering a critical
-error in `wp-settings.php` when tyring to load the file `class-wp-locale.phpp`. The correct
-file name, located in the `wp-content` directory of the application folder, was
-`class-wp-locale.php`.
+- **Medium-term Actions:**
+  - Scheduled regular system audits and performance tuning sessions to keep our servers in tiptop shape, ready to face any mischief-makers.
 
-Patch involved a simple fix on the typo, removing the trailing `p`.
+- **Long-term Actions:**
+  - Instituted a Gremlin Response Team with specialized training in tracking and neutralizing these elusive digital pests.
+  - Launched a company-wide awareness campaign on gremlin defense, making sure everyone knows how to spot and thwart these mischievous adversaries.
 
-## Prevention
-
-This outage was not a web server error, but an application error. To prevent such outages
-moving forward, please keep the following in mind.
-
-* Test! Test test test. Test the application before deploying. This error would have arisen
-and could have been addressed earlier had the app been tested.
-
-* Status monitoring. Enable some uptime-monitoring service such as
-[UptimeRobot](./https://uptimerobot.com/) to alert instantly upon outage of the website.
-
-Note that in response to this error, I wrote a Puppet manifest
-[0-strace_is_your_friend.pp](https://github.com/bdbaraban/holberton-system_engineering-devops/blob/master/0x17-web_stack_debugging_3/0-strace_is_your_friend.pp)
-to automate fixing of any such identitical errors should they occur in the future. The manifest
-replaces any `phpp` extensions in the file `/var/www/html/wp-settings.php` with `php`.
-
-But of course, it will never occur again, because we're programmers, and we never make
-errors! :wink:
+Remember, even in the digital world, gremlins can strike, but with the right tools and a dash of determination, we can send them packing! Stay vigilant, and let's keep the servers singing smoothly! 🚀🛡️
