@@ -34,17 +34,11 @@ def count_words(subreddit, word_list, after='', word_dict={}):
     if response.status_code != 200:
         return None
 
-    try:
-        hot = response.json()['data']['children']
-        aft = response.json()['data']['after']
-        for post in hot:
-            title = post['data']['title']
-            lower = [word.lower() for word in title.split(' ')]
-
-            for word in word_dict.keys():
-                word_dict[word] += lower.count(word)
-
-    except Exception:
-        return None
-
-    count_words(subreddit, word_list, aft, word_dict)
+    if after is None:
+        if len(instances) == 0:
+            print("")
+            return
+        instances = sorted(instances.items(), key=lambda kv: (-kv[1], kv[0]))
+        [print("{}: {}".format(k, v)) for k, v in instances]
+    else:
+        count_words(subreddit, word_list, instances, after, count)
